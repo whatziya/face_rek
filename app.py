@@ -10,6 +10,8 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+PORT = int(os.environ.get("PORT", 8000))
+
 app = FastAPI(
     title="Face Recognition API",
     description="A simple API for face recognition using FastAPI and face_recognition library",
@@ -218,4 +220,4 @@ async def delete_known_face(name: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=PORT)

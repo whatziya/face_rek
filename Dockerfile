@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1
 # Set workdir
 WORKDIR /app
 
-# Install system dependencies for dlib and OpenCV
+# Install system dependencies for OpenCV and dlib
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -16,14 +16,31 @@ RUN apt-get update && apt-get install -y \
     liblapack-dev \
     libx11-dev \
     libgtk-3-dev \
-    libboost-python-dev \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    libglib2.0-0 \
+    libgtk-3-0 \
     && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt /app/
+
+# Install Python dependencies with pre-compiled wheels
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir \
+    --find-links https://pypi.org/simple/ \
+    --prefer-binary \
+    dlib==19.24.6 && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY . /app
 
-# Install Python dependencies
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Create known_faces directory
+RUN mkdir -p known_faces
 
 # Expose port (Render uses this)
 EXPOSE 8000
